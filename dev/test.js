@@ -20,6 +20,4 @@ const currentBlockData = [
   },
 ];
 
-const nonce = 100;
-
-console.log(gooncoin.hashBlock(previousBlockHash, currentBlockData, nonce));
+console.log(gooncoin.hashBlock(previousBlockHash, currentBlockData, 7681));
