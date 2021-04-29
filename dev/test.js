@@ -1,10 +1,25 @@
 const Blockchain = require('./blockchain');
-
 const gooncoin = new Blockchain();
 
-gooncoin.createNewBlock(12345, 'qwerty', 'wasdz');
-gooncoin.createNewTransaction(100, 'JOHN54321', 'BOB54321');
+const previousBlockHash = '1234wasd';
+const currentBlockData = [
+  {
+    amount: 100,
+    sender: 'asdfasdewqwetr',
+    recipient: 'oiutrkjasnfdks'
+  },
+  {
+    amount: 150,
+    sender: '1asdfasdewqwetr',
+    recipient: '1oiutrkjasnfdks'
+  },
+  {
+    amount: 10,
+    sender: '2asdfasdewqwetr',
+    recipient: '2oiutrkjasnfdks'
+  },
+];
 
-gooncoin.createNewBlock(54321, 'qwerty1', 'wasdz1');
+const nonce = 100;
 
-console.log(gooncoin);
+console.log(gooncoin.hashBlock(previousBlockHash, currentBlockData, nonce));
