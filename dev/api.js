@@ -31,7 +31,7 @@ app.get('/mine', (req, res) => {
   const nonce = gooncoin.proofOfWork(previousBlockHash, currentBlockData);
   const blockHash = gooncoin.hashBlock(previousBlockHash, currentBlockData, nonce);
 
-  gooncoin.createNewTransaction(1.0, "00", nodeAddress);
+  gooncoin.createNewTransaction(5.0, "00", nodeAddress);
 
   const newBlock = gooncoin.createNewBlock(nonce, previousBlockHash, blockHash);
   res.json({
