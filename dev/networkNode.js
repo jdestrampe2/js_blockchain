@@ -80,7 +80,11 @@ app.post('/register-node', (req, res) => {
 
 //Register Multiple Nodes at Once
 app.post('/register-nodes-bulk', (req, res) => {
-
+  const newNodeUrl = req.body.newNodeUrl;
+  const nodeNotRegistered = gooncoin.networkNodes.indexOf(newNodeUrl) == -1;
+  const notCurrentNode = gooncoin.currentNodeUrl !== newNodeUrl;
+  if (nodeNotRegistered && notCurrentNode) gooncoin.networkNodes.push(newNodeUrl);
+  res.json({ note: 'New node registered successfully.'});
 });
 
 app.listen(PORT, () => {
