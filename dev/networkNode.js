@@ -1,5 +1,5 @@
 const express = require('express');
-const Blockchain = require('./blockchain');
+const Blockchain = require('../blockchain');
 const { v4: uuidv4 } = require('uuid');
 const rp = require('request-promise');
 const PORT = process.argv[2];
