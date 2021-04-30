@@ -75,16 +75,22 @@ app.post('/register-and-broadcast-node', (req, res) => {
 
 //Register a Node with the Network
 app.post('/register-node', (req, res) => {
-
-});
-
-//Register Multiple Nodes at Once
-app.post('/register-nodes-bulk', (req, res) => {
   const newNodeUrl = req.body.newNodeUrl;
   const nodeNotRegistered = gooncoin.networkNodes.indexOf(newNodeUrl) == -1;
   const notCurrentNode = gooncoin.currentNodeUrl !== newNodeUrl;
   if (nodeNotRegistered && notCurrentNode) gooncoin.networkNodes.push(newNodeUrl);
   res.json({ note: 'New node registered successfully.'});
+});
+
+//Register Multiple Nodes at Once
+app.post('/register-nodes-bulk', (req, res) => {
+  const allNetworkNodes = req.body.allNetworkNodes;
+  allNetworkNodes.forEach(networkNodeUrl => {
+    const nodeNotPresent = gooncoin.networkNodes.indexOf(networkNodeUrl) == -1;
+    const notCurrentNode = gooncoin.currentNodeUrl !== networkNodeUrl;
+    if (nodeNotPresent && notCurrentNode) gooncoin.networkNodes.push(networkNodeUrl);
+  });
+    res.json({ note: 'Bulk Registration Successful.'});
 });
 
 app.listen(PORT, () => {
