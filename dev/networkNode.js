@@ -186,7 +186,7 @@ app.get('/consensus', (req, res) => {
         note: 'Current chain has correct.',
         chain: gooncoin.chain,
       });
-    } else if (newLongestChain && gooncoin.chainIsValid(newLongestChain)) {
+    } else {
         gooncoin.chain = newLongestChain;
         gooncoin.pendingTransactions = newPendingTransactions;
         res.json({
