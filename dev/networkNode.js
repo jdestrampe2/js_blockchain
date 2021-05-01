@@ -190,13 +190,39 @@ app.get('/consensus', (req, res) => {
         gooncoin.chain = newLongestChain;
         gooncoin.pendingTransactions = newPendingTransactions;
         res.json({
-          note: 'Chain has been update.',
+          note: 'Chain has been updated.',
           chain: gooncoin.chain,
         });
       };
   });
 });
 
+app.get('/block/:blockHash', (req, res) => {
+  const blockHash = req.params.blockHash;
+  const correctBlock = gooncoin.getBlock(blockHash);
+  res.json({ block: correctBlock });
+});
+
+app.get('/transaction/:transactionId', (req, res) => {
+  const transactionId = req.params.transactionId;
+  const transactionData = gooncoin.getTransaction(transactionId);
+  res.json({ 
+    transaction: transactionData, 
+    block: transactionData.block,
+  });
+});
+
+app.get('/address/:address', (req, res) => {
+  const address = req.params.address;
+  const addressData = gooncoin.getAddressData(address);
+  res.json({
+    addressData: addressData,
+  });
+});
+
+app.get('/block-explorer', (req, res) => {
+  res.sendFile('./block-explorer/index.html', { root: __dirname });
+});
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}...`);
