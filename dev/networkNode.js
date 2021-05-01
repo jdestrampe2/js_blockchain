@@ -157,6 +157,47 @@ app.post('/register-nodes-bulk', (req, res) => {
     res.json({ note: 'Bulk Registration Successful.'});
 });
 
+app.get('/consensus', (req, res) => {
+  const requestPromises = [];
+  gooncoin.networkNodes.forEach(networkNodeUrl => {
+    const requestOptions = {
+      uri: networkNodeUrl + '/blockchain',
+      method: 'GET',
+      json: true,
+    };
+    requestPomises.push(rp(requestOptions));
+  });
+  Promise.all(requestPromises)
+  .then(blockchains => {
+    const currentChainLength = gooncoin.chain.length;
+    let maxChainLength = currentChainLength;
+    let newLongestChain = null;
+    let newPendingTransactions = null;
+
+    blockchains.forEach(blockchain => {
+      if (blockchain.chain.length > maxChainLength) {
+        maxChainLength = blockchain.chain.length;
+        newLongestChain = blockchain.chain;
+        newPendingTransactions = blockchain.pendingTransactions;
+      };
+    });
+    if (!newLongestChain || (newLongestChain && !gooncoin.chainIsValid(newLongestChain))) {
+      res.json({ 
+        note: 'Current chain has correct.',
+        chain: gooncoin.chain,
+      });
+    } else if (newLongestChain && gooncoin.chainIsValid(newLongestChain)) {
+        gooncoin.chain = newLongestChain;
+        gooncoin.pendingTransactions = newPendingTransactions;
+        res.json({
+          note: 'Chain has been update.',
+          chain: gooncoin.chain,
+        });
+      };
+  });
+});
+
+
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}...`);
 });
