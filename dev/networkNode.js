@@ -49,18 +49,61 @@ app.get('/mine', (req, res) => {
   const currentBlockData = {
     transactions: gooncoin.pendingTransactions,
     index: lastBlock['index'] + 1,
-  }
-
+  };
   const nonce = gooncoin.proofOfWork(previousBlockHash, currentBlockData);
   const blockHash = gooncoin.hashBlock(previousBlockHash, currentBlockData, nonce);
-
-  gooncoin.createNewTransaction(5.0, "00", nodeAddress);
-
   const newBlock = gooncoin.createNewBlock(nonce, previousBlockHash, blockHash);
-  res.json({
-    note: "New block mined successfully!",
-    block: newBlock,
+
+  const requestPromises = [];
+  gooncoin.networkNodes.forEach(networkNodeUrl => {
+    const requestOptions = {
+      uri: networkNodeUrl + '/receive-new-block',
+      method: 'POST',
+      body: { newBlock: newBlock },
+      json: true,
+    };
+    requestPromises.push(rp(requestOptions));
   });
+  Promise.all(requestPromises).then(data => {
+    const requestOptions = {
+      uri: gooncoin.currentNodeUrl + '/transaction/broadcast',
+      method: 'POST',
+      body: {
+        amount: 5.0,
+        sender: "00",
+        recipient: nodeAddress,
+      },
+      json: true
+    };
+    return rp(requestOptions);
+  })
+  .then(data => {
+    res.json({
+      note: "New block mined and broadcast successfully.",
+      block: newBlock,
+    });
+  });
+});
+
+app.post('/receive-new-block', (req, res) => {
+  const newBlock = req.body.newBlock;
+  const lastBlock = gooncoin.getLastBlock();
+  const correctHash = (lastBlock.hash === newBlock.previousBlockHash);
+  const correctIndex = lastBlock['index'] + 1 === newBlock['index'];
+
+  if (correctHash && correctIndex) {
+    gooncoin.chain.push(newBlock);
+    gooncoin.pendingTransactions = [];
+    res.json({
+      note: 'New block received and accepted.',
+      newBlock: newBlock,
+    });
+  } else {
+      res.json({
+        note: 'New block rejected.',
+        newBlock: newBlock,
+      });
+  };
 });
 
 //Register Node and Broadcast it to Network
